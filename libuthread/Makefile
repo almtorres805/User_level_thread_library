@@ -1,6 +1,6 @@
 # Target library
 lib := libuthread.a
-src := queue.c
+src := queue.c uthread.c
 obj := $(src:.c=.o)
 all: $(lib)
 
@@ -11,4 +11,4 @@ $(lib): $(obj)
 %.o: %.c
 	gcc -c -o $@ $<
 clean:
-	rm -f $(lib) $(obj)
+	rm -f $(lib) $(obj) *.o
