@@ -35,7 +35,7 @@ int queue_destroy(queue_t queue)
 int queue_enqueue(queue_t queue, void *data)
 {
 	/* TODO Phase 1 */
-  if (queue == NULL | data == NULL) {
+  if (queue == NULL || data == NULL) {
     return -1;
   }
   
@@ -47,10 +47,12 @@ int queue_enqueue(queue_t queue, void *data)
 
   n->data = data;
   n->next = NULL;
+  // Queue is empty
   if (queue->rear == NULL) {
     queue->rear = n;
     queue->front = n;
   } else {
+    // Append new node to the rear
     queue->rear->next = n;
     queue->rear = n;
   }
@@ -60,19 +62,21 @@ int queue_enqueue(queue_t queue, void *data)
 int queue_dequeue(queue_t queue, void **data)
 {
 	/* TODO Phase 1 */
-  if (queue == NULL | data == NULL | queue->front == NULL) {
+  if (queue == NULL || data == NULL || queue->front == NULL) {
     return -1;
   }
   
+  // Set value of data pointer to address of node to be dequeue'd
   *data = queue->front->data;
-
-  struct node *tmp = queue->front;
+  
+  // Set front to point to second node in the queue
   queue->front = queue->front->next;
-  free(tmp);
-
+  
+  // Set rear to NULL if queue is empty
   if (queue->front == NULL) {
     queue->rear = NULL;
   }
+
   return 0;
 }
 
