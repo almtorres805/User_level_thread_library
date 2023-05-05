@@ -129,8 +129,9 @@ void test_queue_size(void)
   queue_delete(q, &data1);
   TEST_ASSERT(1 == queue_length(q));
 
+  /* Queue is empty */
   queue_delete(q, &data2);
-  TEST_ASSERT(0 == queue_length(q));
+  TEST_ASSERT(-1 == queue_length(q));
 }
 
 
