@@ -126,9 +126,21 @@ int queue_delete(queue_t queue, void *data)
   return -1;
 }
 
+// TODO Make a deletion resistant
 int queue_iterate(queue_t queue, queue_func_t func)
 {
 	/* TODO Phase 1 */
+  if (queue == NULL || func == NULL){
+    return -1;
+  }
+
+  struct node *n = malloc(sizeof(*n));
+  n = queue->front;
+  while(n != NULL){
+    void *data = n->data;
+    func(queue, data);
+    n = n->next;
+  }
 }
 
 int queue_length(queue_t queue)
