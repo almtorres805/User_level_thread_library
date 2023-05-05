@@ -83,6 +83,41 @@ int queue_dequeue(queue_t queue, void **data)
 int queue_delete(queue_t queue, void *data)
 {
 	/* TODO Phase 1 */
+  if (queue == NULL || data == NULL){
+    return -1;
+  }
+  
+  struct node *curr_node = malloc(sizeof(*curr_node));
+  struct node *prev_node = malloc(sizeof(*prev_node));
+  curr_node = queue->front;
+  prev_node = NULL;
+
+  while(curr_node != NULL){
+    // Node was found
+    if (curr_node->data == data){
+      // Deleting the first node in the queue
+      if (prev_node == NULL){
+        queue->front = curr_node->next;
+        // Update rear if delete removed queue of size 1
+        if (queue->front == NULL) {
+          queue->rear = NULL;
+        }
+      } else {
+        // Deleting in the middle/end of the queue
+        prev_node->next = curr_node->next;
+        // Update rear if last item is deleted
+        if (prev_node->next == NULL){
+          queue->rear = prev_node;
+        }
+      }
+      free(curr_node);
+      return 0;
+    }
+    prev_node = curr_node;
+    curr_node = curr_node->next;
+  }
+  // Data was not found
+  return -1;
 }
 
 int queue_iterate(queue_t queue, queue_func_t func)
