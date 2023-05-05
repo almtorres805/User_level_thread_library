@@ -13,6 +13,7 @@ struct queue {
   /* TODO Phase 1 */
   struct node *front;
   struct node *rear;
+  size_t size;
 };
 
 queue_t queue_create(void)
@@ -24,6 +25,7 @@ queue_t queue_create(void)
   }
   q->front = NULL;
   q->rear = NULL;
+  q->size = 0;
   return q;
 }
 
@@ -44,7 +46,8 @@ int queue_enqueue(queue_t queue, void *data)
   if (n == NULL) {
     return -1;
   }
-
+  
+  queue->size++;
   n->data = data;
   n->next = NULL;
   // Queue is empty
@@ -76,6 +79,9 @@ int queue_dequeue(queue_t queue, void **data)
   if (queue->front == NULL) {
     queue->rear = NULL;
   }
+  
+  // decrement size of queue
+  queue->size--;
 
   return 0;
 }
@@ -110,6 +116,7 @@ int queue_delete(queue_t queue, void *data)
           queue->rear = prev_node;
         }
       }
+      queue->size--;
       free(curr_node);
       return 0;
     }
@@ -128,4 +135,5 @@ int queue_iterate(queue_t queue, queue_func_t func)
 int queue_length(queue_t queue)
 {
 	/* TODO Phase 1 */
+  return queue->size;
 }
