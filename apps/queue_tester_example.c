@@ -140,9 +140,9 @@ static void iterator_inc(queue_t q, void *data)
   int *a = (int*)data;
    
   if (*a == 42){
-    printf("%d\n", *a);
-    printf("%d\n", queue_length(q));
-    //queue_delete(q, data);
+    //printf("%d\n", *a);
+    //printf("%d\n", queue_length(q));
+    queue_delete(q, data);
   }
   else{
     *a += 1;
@@ -166,7 +166,7 @@ void test_queue_iterate(void)
   /* Increment every item of the queue, delete item '42' */
   TEST_ASSERT(queue_length(q) == 10);
   queue_iterate(q, iterator_inc);
-  //TEST_ASSERT(queue_length(q) == 9);
+  TEST_ASSERT(queue_length(q) == 9);
 }
 
 
