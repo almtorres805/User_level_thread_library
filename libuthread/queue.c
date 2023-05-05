@@ -75,14 +75,13 @@ int queue_dequeue(queue_t queue, void **data)
   // Set front to point to second node in the queue
   queue->front = queue->front->next;
   
+  // Decrement size of queue
+  queue->size--;
+
   // Set rear to NULL if queue is empty
   if (queue->front == NULL) {
     queue->rear = NULL;
   }
-  
-  // decrement size of queue
-  queue->size--;
-
   return 0;
 }
 
@@ -135,5 +134,8 @@ int queue_iterate(queue_t queue, queue_func_t func)
 int queue_length(queue_t queue)
 {
 	/* TODO Phase 1 */
+  if (queue == NULL || queue->size == 0){
+    return -1;
+  }
   return queue->size;
 }
