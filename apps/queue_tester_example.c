@@ -77,12 +77,37 @@ void test_queue_multiple(void)
   queue_enqueue(q, &data3);
 
   /* Dequeue and check items */
-  queue_dequeue(q, (void*)&ptr);
+  queue_dequeue(q, (void**)&ptr);
   TEST_ASSERT(ptr == &data1);
   queue_dequeue(q, (void**)&ptr);
   TEST_ASSERT(ptr == &data2);
   queue_dequeue(q, (void**)&ptr);
   TEST_ASSERT(ptr == &data3);
+}
+
+/* Test delete */
+void test_queue_delete(void)
+{
+  int data1 = 5, data2 = 6;
+  queue_t q;
+
+  fprintf(stderr, "*** TEST queue_delete ***\n");
+
+  q = queue_create();
+
+  /* Enqueue items */
+  queue_enqueue(q, &data1);
+  queue_enqueue(q, &data2);
+  
+  /* Check if data passed in NULL */
+  TEST_ASSERT(-1 == queue_delete(q, NULL));
+
+  /* delete items */
+  TEST_ASSERT(0 == queue_delete(q, &data1));
+  TEST_ASSERT(0 == queue_delete(q, &data2));
+  
+  /* Check if queue is now empty */
+  TEST_ASSERT(-1 == queue_delete(q, &data2));
 }
 
 int main(void)
@@ -91,6 +116,7 @@ int main(void)
   test_enqueue_null();
 	test_queue_simple();
   test_queue_multiple();
+  test_queue_delete();
 
 	return 0;
 }
