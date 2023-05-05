@@ -110,6 +110,30 @@ void test_queue_delete(void)
   TEST_ASSERT(-1 == queue_delete(q, &data2));
 }
 
+/* Test queue size */
+void test_queue_size(void)
+{
+  int data1 = 5, data2 = 6;
+  queue_t q;
+
+  fprintf(stderr, "*** TEST queue_size ***\n");
+
+  q = queue_create();
+
+  /* Enqueue items */
+  queue_enqueue(q, &data1);
+  queue_enqueue(q, &data2);
+
+  TEST_ASSERT(2 == queue_length(q));
+
+  queue_delete(q, &data1);
+  TEST_ASSERT(1 == queue_length(q));
+
+  queue_delete(q, &data2);
+  TEST_ASSERT(0 == queue_length(q));
+}
+
+
 int main(void)
 {
 	test_create();
@@ -117,6 +141,7 @@ int main(void)
 	test_queue_simple();
   test_queue_multiple();
   test_queue_delete();
+  test_queue_size();
 
 	return 0;
 }
