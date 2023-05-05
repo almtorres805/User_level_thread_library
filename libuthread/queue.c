@@ -138,8 +138,8 @@ int queue_iterate(queue_t queue, queue_func_t func)
   n = queue->front;
   while(n != NULL){
     void *data = n->data;
-    func(queue, data);
     n = n->next;
+    func(queue, data);
   }
 }
 
