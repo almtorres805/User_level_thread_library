@@ -9,6 +9,6 @@ all: $(lib)
 $(lib): $(obj)
 	ar rcs $@ $^
 %.o: %.c
-	gcc -c -o $@ $<
+	gcc -Wall -Wextra -Werror -c -o $@ $<
 clean:
 	rm -f $(lib) $(obj) *.o
