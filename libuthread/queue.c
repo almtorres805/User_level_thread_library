@@ -147,6 +147,7 @@ int queue_iterate(queue_t queue, queue_func_t func)
     n = n->next;
     func(queue, data);
   }
+  return 0;
 }
 
 int queue_length(queue_t queue)
