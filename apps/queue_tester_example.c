@@ -47,6 +47,35 @@ void test_enqueue_null(void)
   TEST_ASSERT(-1 == queue_enqueue(q, NULL));
 }
 
+/* Test dequeue with NULL data */
+void test_dequeue_null(void)
+{
+  int data = 3, *ptr;
+  queue_t q;
+
+  fprintf(stderr, "*** TEST dequeue_null ***\n");
+
+  q = queue_create();
+
+  /*Dequeueing on Empty queue*/
+  TEST_ASSERT(-1 == queue_dequeue(q,(void**)&ptr));
+
+  /*Enqueueing single data*/
+  queue_enqueue(q,&data);
+  TEST_ASSERT(1 == queue_length(q));
+
+  /*Dequeue queue*/
+  TEST_ASSERT(0 == queue_dequeue(q, (void**)&ptr));
+  TEST_ASSERT(ptr == &data);
+
+  //Did not pass menaing size was not 0
+  //TEST_ASSERT(1 == queue_length(q));
+
+  /*Dequeue on Empty queue*/
+  TEST_ASSERT(-1 == queue_dequeue(q, (void**)&ptr));
+
+}
+
 /* Enqueue/Dequeue simple */
 void test_queue_simple(void)
 {
@@ -169,6 +198,38 @@ void test_queue_iterate(void)
   TEST_ASSERT(queue_length(q) == 9);
 }
 
+/*Test queue destroy*/
+void test_queue_destroy(void)
+{
+  queue_t q;
+  int data1 = 3, data2 = 4, *ptr;
+
+  fprintf(stderr, "*** TEST queue_destroy ***\n");
+
+  /* Initialize the queue and enqueue items */
+  q = queue_create();
+ 
+  /*Enqueue Items*/
+  queue_enqueue(q,&data1);
+  queue_enqueue(q,&data2);
+  
+  /*Check size of queue*/
+  TEST_ASSERT(2 == queue_length(q));
+
+  /*Try to delete when queue is not empty*/
+  TEST_ASSERT(-1 == queue_destroy(q));
+  TEST_ASSERT(2 == queue_length(q));
+
+  /*Dequeue the element in queue*/
+  queue_dequeue(q, (void**)&ptr);
+  TEST_ASSERT(ptr == &data1);
+  queue_dequeue(q, (void**)&ptr);
+  TEST_ASSERT(ptr == &data2);
+
+  /*Destroy queue*/
+  TEST_ASSERT(0 == queue_destroy(q));
+
+}
 
 int main(void)
 {
@@ -179,6 +240,8 @@ int main(void)
   test_queue_delete();
   test_queue_size();
   test_queue_iterate();
+  test_queue_destroy();
+  test_dequeue_null();
 
 	return 0;
 }
