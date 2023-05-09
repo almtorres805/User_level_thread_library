@@ -10,7 +10,7 @@
 #include "uthread.h"
 #include "queue.h"
 
-// Global Queues to manage threads
+// Global Queues t:o manage threads
 queue_t ready_q;
 queue_t terminated_q;
 
@@ -37,18 +37,17 @@ void uthread_yield(void)
 {
 	/* TODO Phase 2 */
   struct uthread_tcb *next_t;
-  queue_dequeue(ready_q, (void**)&next_t);
-  
+  queue_dequeue(ready_q, (void**)&next_t);  
+
   uthread_ctx_t *prev = uthread_current()->context;
   uthread_ctx_t *next = next_t->context;
-  
-  next_t->state = RUNNING;
   
   // If current state is in RUNNING state, schedule for execution later
   if (uthread_current()->state == RUNNING){
     queue_enqueue(ready_q, uthread_current());
   }
-
+  
+  next_t->state = RUNNING;
   curr_t = next_t;
   uthread_ctx_switch(prev, next);
 }
@@ -56,6 +55,12 @@ void uthread_yield(void)
 void uthread_exit(void)
 {
 	/* TODO Phase 2 */
+
+  uthread_ctx_destroy_stack(curr_t->sp);
+  curr_t->state = TERMINATED;
+  queue_enqueue(terminated_q, curr_t);
+
+  uthread_yield();
 }
 
 int uthread_create(uthread_func_t func, void *arg)
@@ -110,6 +115,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
   curr_t = idle_t;
   // Initialize the queues
   ready_q = queue_create();
+  terminated_q = queue_create();
   // Create a thread
   uthread_create(func, arg);
   // while loop: if queue_length == 0 then break out
