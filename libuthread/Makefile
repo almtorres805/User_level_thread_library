@@ -1,6 +1,6 @@
 # Target library
 lib := libuthread.a
-src := queue.c uthread.c
+src := queue.c uthread.c context.c
 obj := $(src:.c=.o)
 all: $(lib)
 
