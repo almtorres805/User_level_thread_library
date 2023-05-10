@@ -10,7 +10,7 @@
 #include "uthread.h"
 #include "queue.h"
 
-// Global Queues t:o manage threads
+// Global Queues to manage threads
 queue_t ready_q;
 queue_t terminated_q;
 
@@ -21,7 +21,8 @@ struct uthread_tcb {
   enum{
     RUNNING,
     READY,
-    TERMINATED
+    TERMINATED,
+    BLOCKED
   }state;
 };
 
@@ -46,7 +47,10 @@ void uthread_yield(void)
   if (uthread_current()->state == RUNNING){
     queue_enqueue(ready_q, uthread_current());
   }
-  
+
+  //If current state BLOCKED it will be enqueue to semaphore's blocked_q, utilzed by uthread_block(), 
+  if(uthread_current()->state == BLOCKED){;}
+    
   next_t->state = RUNNING;
   curr_t = next_t;
   uthread_ctx_switch(prev, next);
@@ -143,9 +147,25 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 void uthread_block(void)
 {
 	/* TODO Phase 3 */
+  //Reason to block : tried to sem_down() but count was 0
+  
+  //change state to BLOCKED
+  curr_t->state = BLOCKED;
+
+  //removed thread from running queue and context switch
+  //Modied yield function to check for BLOCKED state  
+  uthread_yield();
+
 }
 
-//void uthread_unblock(struct uthread_tcb *uthread)
-//{
+void uthread_unblock(struct uthread_tcb *uthread)
+{
 	/* TODO Phase 3 */
-//}
+
+  //change state to READY
+  uthread->state = READY;
+
+  //add to running queue
+  queue_enqueue(ready_q,uthread);
+
+}
