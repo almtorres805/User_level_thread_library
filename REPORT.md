@@ -8,4 +8,5 @@ The following design allowed for executing the enqueue, dequeue, and length func
 
 An exception to the O(1) constraints were the delete and iterate functions, which required the queue to be iterated resulting in O(N) time. Deleting a node in the middle/end of the queue follows a similar concept to dequeuing. Deleting a node from the front results in O(1) time because we just need to simply point the front to where the deleted node pointed to (second oldest). The iterate function is relatively simple. It iterates through each node in the queue and passes the required arguments to the user-defined callback function. This function is designed to be resistant to deletion, meaning that if a node is deleted within the callback function, a segmentation fault won't occur because the function avoids calling dereferenced deleted nodes.
 
+### Not Finished yet
 To ensure the proper functionality of our queue implementation, we designed a comprehensive set of tests that cover key aspects of the queue operations. We wanted to ensure the test functions handled edge cases appropriately, and reliable and efficient queue operations.
