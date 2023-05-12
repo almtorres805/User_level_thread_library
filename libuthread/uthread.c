@@ -37,22 +37,39 @@ struct uthread_tcb *uthread_current(void)
 void uthread_yield(void)
 {
 	/* TODO Phase 2 */
+  /*Running Thread*/
   struct uthread_tcb *next_t;
-  queue_dequeue(ready_q, (void**)&next_t);  
+  queue_dequeue(ready_q,(void**)&next_t); 
+
+  //check to see if current there are not any threads to yield to
+  // if(queue_length(ready_q) == 0){
+  //   //cannot yeild since there are no threads left
+  //   printf("No threads remaining");
+  //   queue_enqueue(ready_q,prev_t); //add back till it terminates its function
+
+  // }
+  
+  /*This is the thread waiting to run*/
+  // struct uthread_tcb *next_t;
+  // queue_dequeue(ready_q,(void**)&next_t); 
 
   uthread_ctx_t *prev = uthread_current()->context;
   uthread_ctx_t *next = next_t->context;
   
+  /*Checking State of Current Thread*/
   // If current state is in RUNNING state, schedule for execution later
   if (uthread_current()->state == RUNNING){
+    uthread_current()->state = READY;
     queue_enqueue(ready_q, uthread_current());
   }
 
   //If current state BLOCKED it will be enqueue to semaphore's blocked_q, utilzed by uthread_block(), 
   if(uthread_current()->state == BLOCKED){;}
-    
+
+  /*Assign new thread*/
+  curr_t = next_t;  
   next_t->state = RUNNING;
-  curr_t = next_t;
+  
   uthread_ctx_switch(prev, next);
 }
 
@@ -92,8 +109,14 @@ int uthread_create(uthread_func_t func, void *arg)
   // Create a new thread
   uthread_ctx_init(new_t->context, new_t->sp , func, arg);
 
+  //if its the first thread make current 
+  if(queue_length(ready_q) == 0) {
+    curr_t = new_t;
+  }
+  
   // Add thread to the queue
   queue_enqueue(ready_q, new_t);
+
   return 0;
 }
 
@@ -115,22 +138,28 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
     return -1;
   } 
 
-  idle_t->state = READY;
+  
+  idle_t->state = RUNNING;
   curr_t = idle_t;
+
   // Initialize the queues
   ready_q = queue_create();
   terminated_q = queue_create();
   // Create a thread
   uthread_create(func, arg);
+  //want to make this thread my current thread
   // while loop: if queue_length == 0 then break out
   while (queue_length(ready_q) != 0){
+    //switch threads
     uthread_yield();
   }
-  
-  curr_t->state = TERMINATED;
+
+  curr_t = idle_t;
   idle_t->state = TERMINATED;
   queue_enqueue(terminated_q, curr_t);
-  queue_enqueue(terminated_q, idle_t);
+  //curr_t->state = TERMINATED;
+
+  //queue_enqueue(terminated_q, idle_t);
   // All threads have been executed, now free the memory
   void *terminated_t;
   while (queue_length(terminated_q) != 0){
