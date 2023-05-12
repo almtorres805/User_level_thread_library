@@ -92,58 +92,62 @@ to terminated to indicate that its resources can be deallocated.
 
 
 ## Semaphore API (Phase 3)
-Our Semaphore implementation was going to be the first real scheduling for our
-created user thread library. We thought of our semaphore implementation similar 
-to the lock and unlock functionality we learned in class. Semaphores are
-responsible for specfic shared resources in a program. In our case the shared
-reasource is the CPU/thread of execution or it is respoblie for which thread is
-currently running.Therefore, we created our semaphore struct with only a count 
-and a queue called blocked queue. The value of count would be limited to 0 or 1, 
-making this implentation a binary semaphore implementation. The blocked queue is 
-the queue that holds all threads waiting for the resource of the given semaphore, 
-in this case it was the thread of execution since our multithread was meant to be 
-ran on a single CPU. Our semaphore library consists of 4 functions create(), destroy(), 
-down() and up().The create() function took an integer value as its arguement 
-either being 0 or 1, representing the initial avaliablity to the semaphore's 
-resources. Calling create_sem(0) meant that the semaphore's resource was busy 
-therefore calling sem_down() again on the same semaphore would put that thread into 
-the semaphore's blocked queue. If the function was called as create_sem(1) that made
-the resources available to take by the next sem_down() call. Since we have a create()
-function which creates and returns a pointer of struct semaphore as described, we also
-need a destroy() function that will destroy or free that created semaphore, reducing
-memory leaks and practing good memory management. Our created function intially checks 
-if the semaphore we want to destroy is NULL or if the semaphore's blocked queue is not 
-empty, if so return -1. If the blocked queue is not empty that means we are attempting 
-to destroy a semaphore with threads waiting to be ran. If we did not include this we 
-would lose that thread forever. The reason being is that in out implemention are blocked 
-queues are limited to the semaphore only and once we remove them from the ready queue 
-that exist in the uthread library we can no longer run them until they are put back. 
-Looking back now this could be an issue if the uthread_run function ends and we still 
-have threads in the blocked queue, it will not know since it is only reading the value 
+Our Semaphore implementation was the first real scheduling for our created 
+user-level thread library. We considered our semaphore implementation similar 
+to the lock and unlock functionality we learned in class. Semaphores are 
+responsible for specific shared resources in a program. In our case, the 
+shared resource is the CPU/thread of execution, or it is responsible for 
+determining which thread is currently running. Therefore, we created our 
+semaphore struct with only a count and a queue called a blocked queue. The 
+value of count would be limited to 0 or 1, making this implementation a binary 
+semaphore. The blocked queue is the queue that holds all threads waiting for 
+the resource of the given semaphore, in this case, it was the thread of execution 
+since our multithread was meant to be run on a single CPU.
+
+Our semaphore library consists of 4 functions: create(), destroy(), down(), and 
+up(). The create() function took an integer value as its argument, either being 
+0 or 1, representing the initial availability of the semaphore's resources. 
+Calling create_sem(0) meant that the semaphore's resource was busy, therefore 
+calling sem_down() again on the same semaphore would put that thread into the 
+semaphore's blocked queue. If the function was called as create_sem(1), that made 
+the resources available to be claimed by the next sem_down() call.
+
+Since we have a create() function which creates and returns a pointer to struct 
+semaphore, we also need a destroy() function that will destroy or free that created 
+semaphore, reducing memory leaks and practicing good memory management. Our destroy 
+function initially checks if the semaphore we want to destroy is NULL or if the 
+semaphore's blocked queue is not empty; if so, it returns -1. If the blocked queue 
+is not empty, that means we are attempting to destroy a semaphore with threads waiting 
+to be run. If we did not include this, we would lose that thread forever. The reason 
+being is that in our implementation, our blocked queues are limited to the semaphore 
+only, and once we remove them from the ready queue that exists in the uthread library, 
+we can no longer run them until they are put back.
+
+Looking back now, this could be an issue if the uthread_run function ends and we still 
+have threads in the blocked queue. It will not know since it is only reading the value 
 of the ready queue until it is 0. One solution could be to also have a global blocked 
 thread in the uthread library to ensure all threads go from ready to terminated without 
-ever being lost. Our other two functions sem_up() and sem_down() are the most important 
-as they are responsible for the lock and unlock behavior of the semaphore, allowing us to 
-schedule execution of the threads. Starting with sem_down() which is also know as a 'P'
-operation, which is meant to grab a resource from the semaphore. The sem_down() function took
-a semaphore pointer as an argument. We then check the semaphore's count value, if the value
-was 1 then we would change it to 0, indicating the semaphore's resource is now being used
-making it unavaliable until it is released. The other sceninero in sem_down() is the case
-if the given argument semaphore is 0, then we create a uthread_tcb pointer to retrieve
-the current thread calling the semaphore, then we enqueued that thread to the semaphore's
-blocked queue to hold and blocked the queue in the unthread library by calling uthread_block().
-Block() located in the private.h library making it accessible by sem.c was implemented in
-the unthread.c file. It simply changed the state of the thread to "BLOCKED" and called 
-yield(). The yield function then dequened it from ready and rather to enqueue it back it was 
-gone and gave the thread of execution to the next thread. Finally, we leave that semaphore's
-count as 0. The sem_up() fucntion also know as a 'V' operation is the polar opposite of the 
-sem_down() function. The function takes in a semaphore pointer as its argument then changes
-that semaphores count value to 1. It then checks the size of the semaphore's blocked queue
-if the size of the blocked queue is 0, then the resource is avaiable to take. If the 
-blocked queue size is not 0 then that means we have a thread waiting for the resource. To 
-release the thread we call a uthread_tcb pointer, dequeue the first thread from the blocked 
-list as the uthread_tcb pointer then we call the uthread_unblock() function to unblock the thread.
-Similary, as unthread_block the uthread_unblocked function was defined in private.h and located
-in uthread.c making acessible by sem.c. The unblock function takes in a uthread_tcb pointer as the 
-argument. It changes the threads state to READY and enqueues the thread back on the ready thread to
-be allowed for execution. This is the complete implentation of our Semaphore schduling implemention.
+ever being lost.
+
+Our other two functions, sem_up() and sem_down(), are the most important as they are 
+responsible for the lock and unlock behavior of the semaphore, allowing us to schedule 
+execution of the threads. The sem_down() function, also known as a 'P' operation, is meant 
+to claim a resource from the semaphore. The function took a semaphore pointer as an argument. 
+We then checked the semaphore's count value; if the value was 1, we changed it to 0, 
+indicating the semaphore's resource is now being used, making it unavailable until it is 
+released.
+
+The sem_up() function, also known as a 'V' operation, is the polar opposite of the sem_down() 
+function. The function takes a semaphore pointer as its argument and then changes that 
+semaphore's count value to 1. It then checks the size of the semaphore's blocked queue; 
+if the size of the blocked queue is 0, then the resource is available to take. If the blocked 
+queue size is not 0, then that means we have a thread waiting for the resource.
+
+To release the thread, we create a uthread_tcb pointer, dequeue the first thread from the 
+blocked list using the uthread_tcb pointer, then we call the uthread_unblock() function to 
+unblock the thread. Similarly, as with uthread_block, the uthread_unblock function was defined 
+in private.h and implemented in uthread.c, making it accessible by sem.c.
+
+The unblock function takes a uthread_tcb pointer as an argument. It changes the thread's 
+state to READY and enqueues the thread back on the ready queue to be eligible for execution. 
+This completes the implementation of our Semaphore scheduling mechanism.
