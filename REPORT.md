@@ -1,5 +1,5 @@
 # User-level Thread Library
-## Queue Implementation
+## Queue API (Phase 1)
 Our queue data structure follows a doubly linked list implementation because we 
 needed to ensure O(1) operations for managing the threads in the queue. To 
 accomplish this we defined two structs to populate our queue. The first struct 
@@ -35,13 +35,63 @@ function. This function is designed to be resistant to deletion, meaning that
 if a node is deleted within the callback function, a segmentation fault won't 
 occur because the function avoids calling dereferenced deleted nodes.
 
-### Not Finished yet
-To ensure the proper functionality of our queue implementation, we designed a 
-comprehensive set of tests that cover key aspects of the queue operations. We 
-wanted to ensure the test functions handled edge cases appropriately, and 
-reliable and efficient queue operations.
+To ensure the proper functionality of our queue implementation, we designed
+a comprehensive set of tests that cover key aspects of the queue operations.
+We wanted to ensure the test functions handled edge cases appropriately, and
+reliable and efficient queue operations. We started off by testing the
+conditions that should return -1, to ensure reliability of the queue. This
+included: passing in null values as parameters to the functions, ensuring the
+length of the queue remained consistent, and testing all values that are
+supposed to return -1. We also found it helpful to create simple and complex
+test functions. This helped ensure that we did not miss any important test
+cases that can lead to problems for the later phases of the project. 
 
-## Phase 3
+## Uthread API (Phase 2)
+We have implemented the uthread interface, which provides the uthread API for
+managing threads. Internally, we utilize two global queues and a data
+structure called the thread control block (TCB) to store information about
+each thread. The TCB holds the thread's context (a set of registers), stack
+pointer (points to the top of the stack), and its current state. A thread can
+be in one of four states: READY, RUNNING, BLOCKED (for phase 3), or TERMINATED.
+
+The main function of our uthread API is called uthread_run(). This function
+can be divided into three sections: the idle thread, scheduler execution, and
+deallocation of terminated threads. In the first section, we initialize the
+initial thread, which runs in the background and manages thread resources.
+Initially, the current thread points to the idle thread. Then, we call the
+uthread_create() function to generate a new (parent) thread.
+
+The second section focuses on iterating through the ready queue to check if it
+is empty. If the queue is not empty, the scheduler continues to yield threads
+in a round-robin fashion. In the last section, we focus on memory management
+by deallocating threads that have been terminated, but only when the ready
+queue is empty.
+
+Once the user-level thread library has been initialized by calling
+uthread_run(), users can create and manage threads. The uthread_create()
+function is straightforward. Each time it is called, a new thread is initiated
+with its corresponding TCB properties. Then, the uthread_ctx_init() function
+is invoked to execute the thread's execution context, which is added to the
+ready queue for scheduling.
+
+Our uthread API enables thread switching, also known as context switching.
+We utilize the uthread_ctx_switch() function from the private.h API to perform
+the switches. First, we create two internal contexts: the currently running
+thread is stored as the previous context, and the oldest node in the queue is
+stored as the next context to be executed. During the switch, the previous
+context's contents are stored, and the next context's TCB properties are
+restored before being scheduled to run. In a special case where the currently
+running thread has not finished executing, it is enqueued back in the ready
+queue to await scheduling.
+
+The uthread_exit() function is called when the bootstrap function in context.c
+finishes executing the currently running thread or when a user wants to exit a
+thread prematurely. We deallocate the thread's pointer to the top of the stack
+to prevent it from resuming execution. Additionally, we set the thread's state
+to terminated to indicate that its resources can be deallocated.
+
+
+## Semaphore API (Phase 3)
 Our Semaphore implementation was going to be the first real scheduling for our
 created user thread library. We thought of our semaphore implementation similar 
 to the lock and unlock functionality we learned in class. Semaphores are
