@@ -4,13 +4,14 @@
 
 #include "queue.h"
 
-struct node {
+struct node
+{
   void *data;
   struct node *next;
 };
 
-struct queue {
-  /* TODO Phase 1 */
+struct queue
+{
   struct node *front;
   struct node *rear;
   size_t size;
@@ -18,7 +19,6 @@ struct queue {
 
 queue_t queue_create(void)
 {
-  /* TODO Phase 1 */
   queue_t q = malloc(sizeof(*q));
   if (q == NULL){
     return NULL;
@@ -31,18 +31,15 @@ queue_t queue_create(void)
 
 int queue_destroy(queue_t queue)
 {
-	/* TODO Phase 1 */
   if (queue == NULL || queue->size > 0) {
     return -1;
   }
-
   free(queue);
   return 0;
 }
 
 int queue_enqueue(queue_t queue, void *data)
 {
-	/* TODO Phase 1 */
   if (queue == NULL || data == NULL) {
     return -1;
   }
@@ -70,7 +67,6 @@ int queue_enqueue(queue_t queue, void *data)
 
 int queue_dequeue(queue_t queue, void **data)
 {
-	/* TODO Phase 1 */
   if (queue == NULL || data == NULL || queue->front == NULL) {
     return -1;
   }
@@ -93,13 +89,13 @@ int queue_dequeue(queue_t queue, void **data)
 
 int queue_delete(queue_t queue, void *data)
 {
-	/* TODO Phase 1 */
   if (queue == NULL || data == NULL){
     return -1;
   }
   
   struct node *curr_node = malloc(sizeof(*curr_node));
   struct node *prev_node = malloc(sizeof(*prev_node));
+  
   curr_node = queue->front;
   prev_node = NULL;
 
@@ -132,10 +128,8 @@ int queue_delete(queue_t queue, void *data)
   return -1;
 }
 
-// TODO Make a deletion resistant
 int queue_iterate(queue_t queue, queue_func_t func)
 {
-	/* TODO Phase 1 */
   if (queue == NULL || func == NULL){
     return -1;
   }
@@ -152,7 +146,6 @@ int queue_iterate(queue_t queue, queue_func_t func)
 
 int queue_length(queue_t queue)
 {
-	/* TODO Phase 1 */
   if (queue == NULL || queue->size == 0){
     return -1;
   }
