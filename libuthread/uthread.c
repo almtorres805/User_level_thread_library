@@ -123,6 +123,11 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
   } 
 
   idle_t->state = RUNNING;
+  idle_t->sp = uthread_ctx_alloc_stack();
+  
+  // Background thread to manage resources
+  uthread_ctx_init(idle_t->context, idle_t->sp, func, arg);
+
   curr_t = idle_t;
 
   // Initialize the queues
