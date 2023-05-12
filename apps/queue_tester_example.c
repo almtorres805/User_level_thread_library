@@ -15,16 +15,14 @@ do {									\
 	}									\
 } while(0)
 
-
 /* Create */
 void test_create(void)
 {
 	fprintf(stderr, "*** TEST create ***\n");
-
 	TEST_ASSERT(queue_create() != NULL);
 }
 
-/* Creat NULL */
+/* Create NULL */
 void test_null_create(void)
 {
   // Not sure how to make malloc fail
@@ -57,23 +55,22 @@ void test_dequeue_null(void)
 
   q = queue_create();
 
-  /*Dequeueing on Empty queue*/
-  TEST_ASSERT(-1 == queue_dequeue(q,(void**)&ptr));
+  /* Dequeueing on Empty queue */
+  TEST_ASSERT(-1 == queue_dequeue(q, (void**)&ptr));
 
-  /*Enqueueing single data*/
-  queue_enqueue(q,&data);
+  /* Enqueueing single data */
+  queue_enqueue(q, &data);
   TEST_ASSERT(1 == queue_length(q));
 
-  /*Dequeue queue*/
+  /* Dequeue queue */
   TEST_ASSERT(0 == queue_dequeue(q, (void**)&ptr));
   TEST_ASSERT(ptr == &data);
 
-  //Did not pass menaing size was not 0
-  //TEST_ASSERT(1 == queue_length(q));
-
-  /*Dequeue on Empty queue*/
+  /* Dequeue empty node */
   TEST_ASSERT(-1 == queue_dequeue(q, (void**)&ptr));
 
+  /* Verify size of queue is 0 */
+  TEST_ASSERT(-1 == queue_length(q));
 }
 
 /* Enqueue/Dequeue simple */
@@ -169,8 +166,6 @@ static void iterator_inc(queue_t q, void *data)
   int *a = (int*)data;
    
   if (*a == 42){
-    //printf("%d\n", *a);
-    //printf("%d\n", queue_length(q));
     queue_delete(q, data);
   }
   else{
@@ -228,7 +223,6 @@ void test_queue_destroy(void)
 
   /*Destroy queue*/
   TEST_ASSERT(0 == queue_destroy(q));
-
 }
 
 int main(void)
