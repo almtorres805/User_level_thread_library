@@ -2,7 +2,7 @@
 This project for the ECS150 Operating Systems class involves the development of a User-level Thread Library, consisting of three main phases: Queue API, Uthread API, and Semaphore API.
 
 Phase 1: Queue API
-In this phase, the project aims to create a queue data structure that supports user-level thread management. The queue uses a doubly linked list implementation to ensure O(1) operations for managing threads. Two main structs are defined: "node" and "queue." The "node" struct contains a thread address and a pointer to the next node, while the "queue" struct keeps track of the queue's size and the front and rear nodes.
+In this phase, the project aims to create a queue data structure that supports user-level thread management. The queue uses a doubly linked list implementation to ensure O(1) operations for managing threads.
 
 Functions in the queue perform error checks and return -1 for NULL inputs, with a return value of 0 indicating success. Key operations like enqueue, dequeue, and length are designed to run in O(1) time. Special cases are handled, such as enqueuing into an empty queue and dequeuing the last node. The delete and iterate functions require O(N) time as they involve iterating through the queue.
 
@@ -17,8 +17,6 @@ Context switching, or thread switching, is enabled through the uthread_ctx_switc
 
 Phase 3: Semaphore API
 The Semaphore API introduces scheduling to the user-level thread library. Semaphores manage shared resources, in this case, the CPU/thread of execution. A binary semaphore is implemented with a count and a blocked queue for waiting threads.
-
-Four functions are defined: create(), destroy(), down(), and up(). The create() function initializes a semaphore with an initial count. The destroy() function checks for NULL semaphores and non-empty blocked queues before destroying a semaphore.
 
 The sem_down() function, or 'P' operation, claims a resource from the semaphore, changing its count to 0 if available. The sem_up() function, or 'V' operation, releases a resource, changing the count to 1 and unblocking waiting threads.
 
